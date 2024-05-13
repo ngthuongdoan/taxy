@@ -22,27 +22,17 @@ import org.apache.poi.hpsf.NoPropertySetStreamException;
 import org.apache.poi.hpsf.PropertySet;
 import org.apache.poi.hpsf.SummaryInformation;
 import org.apache.poi.hpsf.UnexpectedPropertySetTypeException;
-import org.apache.poi.ooxml.POIXMLProperties.CoreProperties;
-import org.apache.poi.ooxml.POIXMLProperties.ExtendedProperties;
 import org.apache.poi.poifs.filesystem.DirectoryEntry;
 import org.apache.poi.poifs.filesystem.DocumentEntry;
 import org.apache.poi.poifs.filesystem.DocumentInputStream;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
-public class HelloApplication extends Application {
-	public static void main(String[] args) throws AWTException, InterruptedException {
-		launch(args);
-	}
-
+public class TaxyUtils {
 	// Custom Transferable implementation
 	static class ImageTransferable implements Transferable {
 		private final Image image;
@@ -117,87 +107,65 @@ public class HelloApplication extends Application {
 		return 0;
 	}
 
-	@Override
-	public void start(Stage primaryStage) throws AWTException, InterruptedException {
+	public File getFileFolder(Stage primaryStage, String initialFolderPath) {
+		DirectoryChooser chooser = new DirectoryChooser();
+		chooser.setTitle("Choose folder");
 
-		primaryStage.setTitle("Taxy");
-		Button btn = new Button();
+		File defaultDirectory = new File(initialFolderPath);
+		chooser.setInitialDirectory(defaultDirectory);
 
-		btn.setText("Run");
-		btn.setOnAction(new EventHandler<ActionEvent>() {
+		File selectedDirectory = chooser.showDialog(primaryStage);
 
-			@Override
-			public void handle(ActionEvent event) {
-				try {
-					Robot robot = new Robot();
-					robot.setAutoDelay(300);
-					RobotManager robotUtils = new RobotManager(robot);
-//					copySignature();
-					String projectRootPath = System.getProperty("user.dir");
-					String docxPath = projectRootPath + File.separator + "src\\main\\resources\\sample.docx";
-					System.out.println("Docx: " + docxPath);
-					/* Open the Word Document */
+		return selectedDirectory;
+	}
 
-//					FileInputStream stream;
-//
-//					stream = new FileInputStream(new File(docxPath));
-//					XWPFDocument docx = new XWPFDocument(stream);
-//					ExtendedProperties props = docx.getProperties().getExtendedProperties();
-//					System.out.println("a: "+ props.getPages());
-//					stream.close();
-					File docxFile = new File(docxPath);
-					InputStream is = new FileInputStream(docxFile);
-					POIFSFileSystem poifs = new POIFSFileSystem(is);
-					is.close();
-					/* Read the summary information. */
-					DirectoryEntry dir = poifs.getRoot();
-					SummaryInformation si;
+	public File[] getFilesInFolder(Stage primaryStage, File folder)
+			throws IOException, NoPropertySetStreamException, UnexpectedPropertySetTypeException {
+		File[] files = folder.listFiles();
+		for (File file : files) {
+			System.out.println("Files: " + file);
+		}
 
-					DocumentEntry siEntry = (DocumentEntry) dir.getEntry(SummaryInformation.DEFAULT_STREAM_NAME);
-					DocumentInputStream dis = new DocumentInputStream(siEntry);
-					PropertySet ps = new PropertySet(dis);
-					dis.close();
-					si = new SummaryInformation(ps);
+		System.out.println("Done");
+		return files;
+	}
 
-					System.out.println("asd: "+si.getPageCount());
-					// Execute the command to open the file
-					if (docxFile.exists()) {
-						Desktop.getDesktop().open(docxFile);
-					} else {
-						System.out.println("File does not exist: " + docxPath);
-					}
-//				    p.waitFor();
-					System.out.println("Done");
-					// Wait for the file to open
-					Thread.sleep(10000);
+	public void run(File file) {
 
-					int totalPages = getTotalFilePages("assets/sample.docx");
-					System.out.println("Total pages: " + totalPages);
+		Robot robot;
+		try {
+			robot = new Robot();
 
-					int pageLimit = 10;
-					for (int i = 0; i < pageLimit; i++) {
-						pasteSignature(robotUtils);
-						refineSignature(robotUtils);
-						dragSignature(robotUtils);
-						robot.keyPress(KeyEvent.VK_PAGE_DOWN);
-						robot.keyRelease(KeyEvent.VK_PAGE_DOWN);
-					}
-
-					robot.keyPress(KeyEvent.VK_S);
-					robot.keyRelease(KeyEvent.VK_S);
-					robot.keyPress(KeyEvent.VK_CONTROL);
-					robot.keyPress(KeyEvent.VK_W);
-					robot.keyRelease(KeyEvent.VK_W);
-					robot.keyRelease(KeyEvent.VK_CONTROL);
-				} catch (AWTException | IOException | InterruptedException | NoPropertySetStreamException | UnexpectedPropertySetTypeException e) {
-					e.printStackTrace();
-				}
+			robot.setAutoDelay(300);
+			RobotManager robotUtils = new RobotManager(robot);
+			// Execute the command to open the file
+			if (file.exists()) {
+				Desktop.getDesktop().open(file);
+			} else {
+				System.out.println("File does not exist: " + file);
 			}
-		});
+			// Wait for the file to open
+			Thread.sleep(10000);
 
-		StackPane root = new StackPane();
-		root.getChildren().add(btn);
-		primaryStage.setScene(new Scene(root, 300, 250));
-		primaryStage.show();
+			int pageLimit = 10;
+			for (int i = 0; i < pageLimit; i++) {
+				pasteSignature(robotUtils);
+				refineSignature(robotUtils);
+				dragSignature(robotUtils);
+				robot.keyPress(KeyEvent.VK_PAGE_DOWN);
+				robot.keyRelease(KeyEvent.VK_PAGE_DOWN);
+			}
+
+			robot.keyPress(KeyEvent.VK_S);
+			robot.keyRelease(KeyEvent.VK_S);
+			robot.keyPress(KeyEvent.VK_CONTROL);
+			robot.keyPress(KeyEvent.VK_W);
+			robot.keyRelease(KeyEvent.VK_W);
+			robot.keyRelease(KeyEvent.VK_CONTROL);
+		} catch (AWTException | InterruptedException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

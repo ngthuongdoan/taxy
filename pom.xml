@@ -8,7 +8,7 @@
 	<artifactId>TestJavaFX</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<name>TestJavaFX</name>
-
+	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>5.10.0</junit.version>
@@ -58,6 +58,69 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>
+								${project.build.directory}/${project.build.finalName}.lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>${project.build.finalName}.lib/</classpathPrefix>
+							<mainClass>${fully.qualified.main.class}</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>antrun-archive</id>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<property name="final.name"
+									value="${project.build.directory}/${project.build.finalName}" />
+								<property name="archive.includes"
+									value="${project.build.finalName}.${project.packaging} ${project.build.finalName}.lib/*" />
+								<property name="tar.destfile"
+									value="${final.name}.tar" />
+								<zip basedir="${project.build.directory}"
+									destfile="${final.name}.zip"
+									includes="${archive.includes}" />
+								<tar basedir="${project.build.directory}"
+									destfile="${tar.destfile}"
+									includes="${archive.includes}" />
+								<gzip src="${tar.destfile}"
+									destfile="${tar.destfile}.gz" />
+								<bzip2 src="${tar.destfile}"
+									destfile="${tar.destfile}.bz2" />
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
