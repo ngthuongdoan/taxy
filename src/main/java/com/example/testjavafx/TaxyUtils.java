@@ -1,10 +1,12 @@
 package com.example.testjavafx;
 
-import java.awt.AWTException;
-import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.Robot;
-import java.awt.Toolkit;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import org.apache.poi.hpsf.NoPropertySetStreamException;
+import org.apache.poi.hpsf.UnexpectedPropertySetTypeException;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -12,25 +14,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-
-import org.apache.poi.hpsf.NoPropertySetStreamException;
-import org.apache.poi.hpsf.PropertySet;
-import org.apache.poi.hpsf.SummaryInformation;
-import org.apache.poi.hpsf.UnexpectedPropertySetTypeException;
-import org.apache.poi.poifs.filesystem.DirectoryEntry;
-import org.apache.poi.poifs.filesystem.DocumentEntry;
-import org.apache.poi.poifs.filesystem.DocumentInputStream;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
 
 public class TaxyUtils {
 	// Custom Transferable implementation
@@ -149,6 +133,9 @@ public class TaxyUtils {
 
 			int pageLimit = 10;
 			for (int i = 0; i < pageLimit; i++) {
+				String projectRootPath = System.getProperty("user.dir");
+				String imagePath = projectRootPath + "/src/main/resources/signature.png";
+				robotUtils.copyToClipboard(imagePath);
 				pasteSignature(robotUtils);
 				refineSignature(robotUtils);
 				dragSignature(robotUtils);

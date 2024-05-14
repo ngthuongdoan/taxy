@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.example</groupId>
@@ -12,6 +12,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>5.10.0</junit.version>
+		<fully.qualified.main.class>com.example.testjavafx.TaxyApplication</fully.qualified.main.class>
+		<final.name>${project.build.directory}/${project.build.finalName}</final.name>
+		<archive.includes>${project.build.finalName}.${project.packaging} ${project.build.finalName}.lib/*</archive.includes>
+		<tar.destfile>${final.name}.tar</tar.destfile>
 	</properties>
 
 	<dependencies>
@@ -61,6 +65,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.2</version>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
@@ -78,6 +83,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -91,6 +97,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
+				<version>3.0.0</version>
 				<executions>
 					<execution>
 						<id>antrun-archive</id>
@@ -101,21 +108,21 @@
 						<configuration>
 							<target>
 								<property name="final.name"
-									value="${project.build.directory}/${project.build.finalName}" />
+										  value="${project.build.directory}/${project.build.finalName}" />
 								<property name="archive.includes"
-									value="${project.build.finalName}.${project.packaging} ${project.build.finalName}.lib/*" />
+										  value="${project.build.finalName}.${project.packaging} ${project.build.finalName}.lib/*" />
 								<property name="tar.destfile"
-									value="${final.name}.tar" />
+										  value="${final.name}.tar" />
 								<zip basedir="${project.build.directory}"
-									destfile="${final.name}.zip"
-									includes="${archive.includes}" />
+									 destfile="${final.name}.zip"
+									 includes="${archive.includes}" />
 								<tar basedir="${project.build.directory}"
-									destfile="${tar.destfile}"
-									includes="${archive.includes}" />
+									 destfile="${tar.destfile}"
+									 includes="${archive.includes}" />
 								<gzip src="${tar.destfile}"
-									destfile="${tar.destfile}.gz" />
+									  destfile="${tar.destfile}.gz" />
 								<bzip2 src="${tar.destfile}"
-									destfile="${tar.destfile}.bz2" />
+									   destfile="${tar.destfile}.bz2" />
 							</target>
 						</configuration>
 					</execution>
