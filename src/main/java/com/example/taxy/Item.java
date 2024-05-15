@@ -1,4 +1,4 @@
-package com.example.testjavafx;
+package com.example.taxy;
 
 public class Item {
     private final String filePath;

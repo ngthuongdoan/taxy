@@ -1,4 +1,4 @@
-package com.example.testjavafx;
+package com.example.taxy;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -45,8 +45,8 @@ public record RobotManager(Robot robot) {
             BufferedImage originalImage = ImageIO.read(new File(imagePath));
 
             // Resize the image
-            int width = 150;
-            int height = 150;
+            int width = 600;
+            int height = 368;
             Image scaledImage = originalImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
 
             // Convert the scaled image back to a BufferedImage

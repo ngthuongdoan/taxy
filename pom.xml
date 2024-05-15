@@ -5,14 +5,14 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.example</groupId>
-	<artifactId>TestJavaFX</artifactId>
+	<artifactId>Taxy</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<name>TestJavaFX</name>
+	<name>Taxy</name>
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<junit.version>5.10.0</junit.version>
-		<fully.qualified.main.class>com.example.testjavafx.TaxyApplication</fully.qualified.main.class>
+		<fully.qualified.main.class>com.example.taxy.TaxyApplication</fully.qualified.main.class>
 		<final.name>${project.build.directory}/${project.build.finalName}</final.name>
 		<archive.includes>${project.build.finalName}.${project.packaging} ${project.build.finalName}.lib/*</archive.includes>
 		<tar.destfile>${final.name}.tar</tar.destfile>
@@ -46,11 +46,6 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi</artifactId>
-			<version>5.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
 			<version>5.2.0</version>
 		</dependency>
 		<dependency>
@@ -148,7 +143,7 @@
 						<id>default-cli</id>
 						<configuration>
 							<mainClass>
-								com.example.testjavafx/com.example.testjavafx.HelloApplication</mainClass>
+								com.example.taxy/com.example.taxy.TaxyApplication</mainClass>
 							<launcher>app</launcher>
 							<jlinkZipName>app</jlinkZipName>
 							<jlinkImageName>app</jlinkImageName>

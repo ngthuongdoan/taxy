@@ -1,6 +1,7 @@
-package com.example.testjavafx;
+package com.example.taxy;
 
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.hpsf.NoPropertySetStreamException;
 import org.apache.poi.hpsf.UnexpectedPropertySetTypeException;
@@ -103,6 +104,19 @@ public class TaxyUtils {
 		return selectedDirectory;
 	}
 
+	public File getSignaturePath(Stage primaryStage, String initialSignaturePath) {
+		// Create a FileChooser
+		FileChooser fileChooser = new FileChooser();
+
+// Set extension filter
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+		fileChooser.getExtensionFilters().add(extFilter);
+
+// Show open file dialog
+		Stage stage = new Stage(); // Use your actual Stage here
+		return fileChooser.showOpenDialog(stage);
+	}
+
 	public File[] getFilesInFolder(Stage primaryStage, File folder)
 			throws IOException, NoPropertySetStreamException, UnexpectedPropertySetTypeException {
 		File[] files = folder.listFiles();
@@ -114,13 +128,13 @@ public class TaxyUtils {
 		return files;
 	}
 
-	public void run(File file) {
+	public void run(File file, File signature) {
 
 		Robot robot;
 		try {
 			robot = new Robot();
 
-			robot.setAutoDelay(300);
+			robot.setAutoDelay(200);
 			RobotManager robotUtils = new RobotManager(robot);
 			// Execute the command to open the file
 			if (file.exists()) {
@@ -129,27 +143,63 @@ public class TaxyUtils {
 				System.out.println("File does not exist: " + file);
 			}
 			// Wait for the file to open
-			Thread.sleep(10000);
-
+			robot.delay(10000);
 			int pageLimit = 10;
 			for (int i = 0; i < pageLimit; i++) {
-				String projectRootPath = System.getProperty("user.dir");
-				String imagePath = projectRootPath + "/src/main/resources/signature.png";
-				robotUtils.copyToClipboard(imagePath);
+				robotUtils.copyToClipboard(signature.getAbsolutePath());
 				pasteSignature(robotUtils);
 				refineSignature(robotUtils);
 				dragSignature(robotUtils);
 				robot.keyPress(KeyEvent.VK_PAGE_DOWN);
 				robot.keyRelease(KeyEvent.VK_PAGE_DOWN);
 			}
+			// Simulate F12 key press
+			robot.keyPress(KeyEvent.VK_F12);
+			// Release keys
+			robot.keyRelease(KeyEvent.VK_F12);
+			// Wait for the save dialog to open
+			robot.delay(2000);
+			// Get the file name
+			String fileName = file.getName();
 
-			robot.keyPress(KeyEvent.VK_S);
-			robot.keyRelease(KeyEvent.VK_S);
-			robot.keyPress(KeyEvent.VK_CONTROL);
-			robot.keyPress(KeyEvent.VK_W);
-			robot.keyRelease(KeyEvent.VK_W);
-			robot.keyRelease(KeyEvent.VK_CONTROL);
-		} catch (AWTException | InterruptedException | IOException e) {
+			// Get the name without extension
+			String nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+
+			// Append "_signed" to the name
+			String newName = nameWithoutExtension + "_signed";
+
+			// Get the extension
+			String extension = fileName.substring(fileName.lastIndexOf('.'));
+
+			// Combine the new name with the extension
+			String newFileName = newName + extension;
+			for (char c : newFileName.toCharArray()) {
+				if (c == '_') {
+					// Special case for underscore
+					robot.keyPress(KeyEvent.VK_SHIFT);
+					robot.keyPress(KeyEvent.VK_MINUS);
+					robot.keyRelease(KeyEvent.VK_MINUS);
+					robot.keyRelease(KeyEvent.VK_SHIFT);
+				} else {
+					int keyCode = KeyEvent.getExtendedKeyCodeForChar(c);
+					if (KeyEvent.CHAR_UNDEFINED == keyCode) {
+						throw new RuntimeException("Key code not found for character '" + c + "'");
+					}
+					robot.keyPress(keyCode);
+					robot.keyRelease(keyCode);
+				}
+			}
+			// Press Enter to save the file
+			robot.keyPress(KeyEvent.VK_ENTER);
+			robot.keyRelease(KeyEvent.VK_ENTER);
+			robot.delay(2000);
+
+			robot.keyPress(KeyEvent.VK_F4);
+			robot.keyPress(KeyEvent.VK_ALT);
+			robot.keyRelease(KeyEvent.VK_F4);
+			robot.keyRelease(KeyEvent.VK_ALT);
+
+		} catch (AWTException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
