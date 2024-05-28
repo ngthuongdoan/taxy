@@ -1,4 +1,4 @@
-package com.example.testjavafx;
+package com.example.taxy;
 
 import java.awt.AWTException;
 import java.io.File;
@@ -23,7 +23,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -35,7 +34,7 @@ public class TaxyUI {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void createTable(TableView<Item> tblFiles, TaxyUtils taxyUtils, FolderWrapper folderWrapper)
+	public void createTable(TableView<Item> tblFiles, TaxyUtils taxyUtils, FolderWrapper folderWrapper, SignatureWrapper signatureWrapper)
 			throws NoPropertySetStreamException, UnexpectedPropertySetTypeException, IOException {
 		File[] files = taxyUtils.getFilesInFolder(this.primaryStage, folderWrapper.getFolder());
 		TableColumn<Item, String> colFile = new TableColumn<Item, String>("File");
@@ -63,7 +62,7 @@ public class TaxyUI {
 										} else {
 											btn.setOnAction(event -> {
 												Item file = getTableView().getItems().get(getIndex());
-												taxyUtils.run(new File(file.getFilePath()));
+												taxyUtils.run(new File(file.getFilePath()), signatureWrapper.getSignature());
 											});
 											setGraphic(btn);
 											setText(null);
@@ -89,10 +88,11 @@ public class TaxyUI {
 		String projectRootPath = System.getProperty("user.dir");
 		String initialFolderPath = projectRootPath + File.separator + "src\\main\\resources\\";
 		TaxyUtils taxyUtils = new TaxyUtils();
-		HBox topControls = new HBox();
+		HBox topControls = new HBox(16);
 		topControls.setPadding(new Insets(12));
 		Button browseFolderBtn = new Button("Thư mục");
-		topControls.getChildren().add(browseFolderBtn);
+		Button browseSignatureBtn = new Button("Chữ ký");
+		topControls.getChildren().addAll(browseFolderBtn, browseSignatureBtn);
 		FolderWrapper folderWrapper = new FolderWrapper(new File(initialFolderPath));
 		TableView<Item> tblFiles = new TableView<Item>();
 
@@ -101,7 +101,6 @@ public class TaxyUI {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-
 				folderWrapper.setFolder(taxyUtils.getFileFolder(primaryStage, initialFolderPath));
 				// Refresh the table view with the new files
 				try {
@@ -112,16 +111,23 @@ public class TaxyUI {
 				}
 			}
 		});
+		String imagePath = projectRootPath + "/src/main/resources/signature.png";
+		SignatureWrapper signatureWrapper = new SignatureWrapper(new File(imagePath));
+
+		browseSignatureBtn.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				signatureWrapper.setSignature(taxyUtils.getSignaturePath(primaryStage, initialFolderPath));
+            }
+		});
 
 		Separator sep = new Separator();
-		this.createTable(tblFiles, taxyUtils, folderWrapper);
+		this.createTable(tblFiles, taxyUtils, folderWrapper, signatureWrapper);
 		// Create a Text node with the specified text
 
-		Label paddedText = new Label("Hãy copy chữ ký của bạn trước khi khởi chạy");
-		paddedText.setPadding(new Insets(12)); // Set the font style to italic
-		Font font = Font.font("Inter", FontWeight.NORMAL, FontPosture.ITALIC, 14);
-		paddedText.setFont(font);
-		vbox.getChildren().addAll(topControls, tblFiles, sep, paddedText);
+		vbox.getChildren().addAll(topControls, tblFiles, sep);
 
 		// Create a scene and set it on the stage
 		Scene scene = new Scene(vbox, 800, 400);

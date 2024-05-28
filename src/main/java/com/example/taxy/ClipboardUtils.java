@@ -1,4 +1,4 @@
-package com.example.testjavafx;
+package com.example.taxy;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
