@@ -1,31 +1,17 @@
 package com.example.taxy;
 
-import java.awt.AWTException;
-import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.Robot;
-import java.awt.Toolkit;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-
+import javafx.application.Application;
+import javafx.stage.Stage;
+import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.poi.hpsf.NoPropertySetStreamException;
 import org.apache.poi.hpsf.UnexpectedPropertySetTypeException;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class TaxyApplication extends Application {
-	public static void main(String[] args) throws AWTException, InterruptedException {
+	public static void main(String[] args) {
 		launch(args);
 	}
 
@@ -33,12 +19,28 @@ public class TaxyApplication extends Application {
 	public void start(Stage primaryStage) throws AWTException, InterruptedException {
 		TaxyUI UI = new TaxyUI(primaryStage);
 		try {
+			String projectRootPath = System.getProperty("user.dir");
+			String wordPath = projectRootPath + "/src/main/resources/sample.pdf";
+			getTotalPages(wordPath);
 			UI.createUI();
 			UI.run();
 		} catch (NoPropertySetStreamException | UnexpectedPropertySetTypeException | AWTException | InterruptedException
 				| IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+	}
+
+	public static int getTotalPages(String filePath) {
+		File file = new File(filePath);
+
+		try (PDDocument document = PDDocument.load(file)) {
+			int totalPages = document.getNumberOfPages();
+			System.out.println("Total pages: " + totalPages);
+			return totalPages;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return -1;
 		}
 	}
 }
